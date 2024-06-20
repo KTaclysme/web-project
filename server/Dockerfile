@@ -1,4 +1,4 @@
-# Étape 1
+# Étape 1 : Construire l'application
 FROM node:20.14.0 as build
 
 WORKDIR /app
@@ -10,31 +10,16 @@ COPY . .
 
 RUN npm run build
 
-# Étape 2
+# Étape 2 : Exécuter l'application
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Installation postgresql-client
-RUN apk add --no-cache postgresql-client
-
 COPY package*.json ./
-RUN npm install --only=development
+RUN npm install --only=production
 
 COPY --from=build /app/dist ./dist
 
-# Copie du script wait-for.sh et entrypoint.sh
-COPY wait-for.sh /wait-for.sh
-RUN chmod +x /wait-for.sh
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Copie du dossier prisma
-COPY prisma ./prisma
-COPY tsconfig.json ./
-
 EXPOSE 3000
 
-# Run le projetj
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["node", "dist/main.js"]
