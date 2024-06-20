@@ -13,8 +13,8 @@ interface HelloData {
 function App() {
   const { loading, error, data } = useQuery<HelloData>(HELLO_QUERY);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  if (loading) return <p>Chargement . . .</p>;
+  if (error) return <p>Erreur de lien avec le back !</p>;
 
   return (
     <div>
