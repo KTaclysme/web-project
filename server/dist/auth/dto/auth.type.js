@@ -9,17 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateUserInput = void 0;
-const create_user_input_1 = require("./create-user.input");
+exports.AuthType = void 0;
 const graphql_1 = require("@nestjs/graphql");
-let UpdateUserInput = class UpdateUserInput extends (0, graphql_1.PartialType)(create_user_input_1.CreateUserInput) {
+let AuthType = class AuthType {
 };
-exports.UpdateUserInput = UpdateUserInput;
+exports.AuthType = AuthType;
 __decorate([
-    (0, graphql_1.Field)(() => graphql_1.Int),
-    __metadata("design:type", Number)
-], UpdateUserInput.prototype, "id", void 0);
-exports.UpdateUserInput = UpdateUserInput = __decorate([
-    (0, graphql_1.InputType)()
-], UpdateUserInput);
-//# sourceMappingURL=update-user.input.js.map
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], AuthType.prototype, "access_token", void 0);
+exports.AuthType = AuthType = __decorate([
+    (0, graphql_1.ObjectType)()
+], AuthType);
+//# sourceMappingURL=auth.type.js.map

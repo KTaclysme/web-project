@@ -9,16 +9,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUserInput = void 0;
+exports.UserType = void 0;
 const graphql_1 = require("@nestjs/graphql");
-let CreateUserInput = class CreateUserInput {
+let UserType = class UserType {
 };
-exports.CreateUserInput = CreateUserInput;
+exports.UserType = UserType;
 __decorate([
-    (0, graphql_1.Field)(() => graphql_1.Int, { description: 'Example field (placeholder)' }),
+    (0, graphql_1.Field)(() => graphql_1.Int),
     __metadata("design:type", Number)
-], CreateUserInput.prototype, "exampleField", void 0);
-exports.CreateUserInput = CreateUserInput = __decorate([
-    (0, graphql_1.InputType)()
-], CreateUserInput);
-//# sourceMappingURL=create-user.input.js.map
+], UserType.prototype, "id", void 0);
+__decorate([
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], UserType.prototype, "username", void 0);
+__decorate([
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], UserType.prototype, "password", void 0);
+exports.UserType = UserType = __decorate([
+    (0, graphql_1.ObjectType)()
+], UserType);
+//# sourceMappingURL=user.type.js.map
