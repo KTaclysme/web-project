@@ -15,66 +15,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const users_service_1 = require("./users.service");
-const user_entity_1 = require("./entities/user.entity");
-const create_user_input_1 = require("./dto/create-user.input");
-const update_user_input_1 = require("./dto/update-user.input");
+const user_type_1 = require("./dto/user.type");
+const common_1 = require("@nestjs/common");
+const gql_jwt_auth_guard_1 = require("../auth/gql-jwt-auth.guard");
 let UsersResolver = class UsersResolver {
     constructor(usersService) {
         this.usersService = usersService;
     }
-    createUser(createUserInput) {
-        return this.usersService.create(createUserInput);
+    async me(context) {
+        const { userId } = context.req.user;
+        return this.usersService.findOneById(userId);
     }
-    findAll() {
+    async users() {
         return this.usersService.findAll();
     }
-    findOne(id) {
-        return this.usersService.findOne(id);
-    }
-    updateUser(updateUserInput) {
-        return this.usersService.update(updateUserInput.id, updateUserInput);
-    }
-    removeUser(id) {
-        return this.usersService.remove(id);
+    async user(id) {
+        return this.usersService.findOneById(id);
     }
 };
 exports.UsersResolver = UsersResolver;
 __decorate([
-    (0, graphql_1.Mutation)(() => user_entity_1.User),
-    __param(0, (0, graphql_1.Args)('createUserInput')),
+    (0, common_1.UseGuards)(gql_jwt_auth_guard_1.GqlJwtAuthGuard),
+    (0, graphql_1.Query)(returns => user_type_1.UserType),
+    __param(0, (0, graphql_1.Context)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_input_1.CreateUserInput]),
-    __metadata("design:returntype", void 0)
-], UsersResolver.prototype, "createUser", null);
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersResolver.prototype, "me", null);
 __decorate([
-    (0, graphql_1.Query)(() => [user_entity_1.User], { name: 'users' }),
+    (0, graphql_1.Query)(returns => [user_type_1.UserType]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], UsersResolver.prototype, "findAll", null);
+    __metadata("design:returntype", Promise)
+], UsersResolver.prototype, "users", null);
 __decorate([
-    (0, graphql_1.Query)(() => user_entity_1.User, { name: 'user' }),
-    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.Int })),
+    (0, graphql_1.Query)(returns => user_type_1.UserType, { nullable: true }),
+    __param(0, (0, graphql_1.Args)('id', { type: () => Number })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
-], UsersResolver.prototype, "findOne", null);
-__decorate([
-    (0, graphql_1.Mutation)(() => user_entity_1.User),
-    __param(0, (0, graphql_1.Args)('updateUserInput')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [update_user_input_1.UpdateUserInput]),
-    __metadata("design:returntype", void 0)
-], UsersResolver.prototype, "updateUser", null);
-__decorate([
-    (0, graphql_1.Mutation)(() => user_entity_1.User),
-    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.Int })),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
-], UsersResolver.prototype, "removeUser", null);
+    __metadata("design:returntype", Promise)
+], UsersResolver.prototype, "user", null);
 exports.UsersResolver = UsersResolver = __decorate([
-    (0, graphql_1.Resolver)(() => user_entity_1.User),
+    (0, graphql_1.Resolver)(of => user_type_1.UserType),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersResolver);
 //# sourceMappingURL=users.resolver.js.map

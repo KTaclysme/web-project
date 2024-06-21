@@ -15,6 +15,9 @@ const path_1 = require("path");
 const apollo_1 = require("@nestjs/apollo");
 const sample_resolver_1 = require("./sample/sample.resolver");
 const sample_service_1 = require("./sample/sample.service");
+const auth_module_1 = require("./auth/auth.module");
+const users_module_1 = require("./users/users.module");
+const prisma_module_1 = require("./prisma/prisma.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,6 +28,9 @@ exports.AppModule = AppModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
             }),
+            auth_module_1.AuthModule,
+            users_module_1.UsersModule,
+            prisma_module_1.PrismaModule
         ],
         controllers: [
             app_controller_1.AppController

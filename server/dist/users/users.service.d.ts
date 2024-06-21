@@ -1,9 +1,13 @@
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 export declare class UsersService {
-    create(createUserInput: CreateUserInput): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateUserInput: UpdateUserInput): string;
-    remove(id: number): string;
+    private readonly prisma;
+    constructor(prisma: PrismaService);
+    create(data: {
+        username: string;
+        password: string;
+    }): Promise<User>;
+    findAll(): Promise<User[]>;
+    findOneById(id: number): Promise<User | null>;
+    findOneByUsername(username: string): Promise<User | null>;
 }
