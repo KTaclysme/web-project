@@ -9,6 +9,7 @@ import { SampleService } from './sample/sample.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     AuthModule,
     UsersModule,
-    PrismaModule
+    PrismaModule,
+    MessagesModule
   ],
   controllers: [
     AppController
