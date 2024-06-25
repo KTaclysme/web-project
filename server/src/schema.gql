@@ -14,7 +14,8 @@ type AuthType {
 
 type MessageType {
   id: Int!
-  message: String!
+  userId: Int!
+  content: String!
 }
 
 type Query {
@@ -22,12 +23,13 @@ type Query {
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
-  messages: [MessageType!]!
+  messages(userId: Int!): [MessageType!]!
 }
 
 type Mutation {
   login(authInput: AuthInput!): AuthType!
   signup(authInput: AuthInput!): UserType!
+  createMessage(id: Int!, content: String!, userId: Int!): MessageType!
 }
 
 input AuthInput {
