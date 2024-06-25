@@ -14,14 +14,15 @@ type AuthType {
 
 type MessageType {
   id: Int!
-  message: String!
+  userId: Int!
+  content: String!
 }
 
 type Query {
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
-  messages: [MessageType!]!
+  messages(userId: Int!): [MessageType!]!
 }
 
 type Mutation {
