@@ -12,11 +12,17 @@ type AuthType {
   access_token: String!
 }
 
+type MessageType {
+  id: Int!
+  message: String!
+}
+
 type Query {
   hello: String!
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
+  messages: [MessageType!]!
 }
 
 type Mutation {
