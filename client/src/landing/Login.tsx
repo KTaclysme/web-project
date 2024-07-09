@@ -57,16 +57,15 @@ export default function Login() {
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Connexion</h1>
           <p className="text-muted-foreground">
-            Entrez votre email ci-dessous pour vous connecter à votre compte.
+            Entrez votre Username ci-dessous pour vous connecter à votre compte.
           </p>
         </div>
         <form className="space-y-4" onSubmit={handleLogin}>
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Pseudo</Label>
             <Input
               id="username"
               type="username"
-              placeholder="m@example.com"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -87,10 +86,10 @@ export default function Login() {
           </Button>
         </form>
         <Link
-          to="#"
+          to="/signup"
           className="inline-block w-full text-center text-sm underline"
         >
-          Mot de passe oublié ?
+          S'inscrire ?
         </Link>
       </div>
     </div>

@@ -50,21 +50,24 @@ export default function SignUp() {
       <div className="mx-auto max-w-sm space-y-6 bg-white p-8 shadow-lg rounded-lg">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Inscription</h1>
+          <p className="text-muted-foreground">
+            Entrez votre Username ci-dessous pour vous connecter à votre compte.
+          </p>
         </div>
         <form className="space-y-4" onSubmit={handleSignup}>
+          {" "}
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Pseudo</Label>{" "}
             <Input
               id="username"
               type="text"
-              placeholder="username"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Mot de passe</Label>
             <Input
               id="password"
               type="password"
