@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MessagesService } from './messages.service';
 import { MessagesResolver } from './messages.resolver';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { BullMQModule } from '../bullmq/bullmq.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule],
-  providers: [MessagesResolver, MessagesService],
-  exports: [MessagesService]
+  imports: [BullMQModule, PrismaModule],
+  providers: [MessagesResolver],
 })
 export class MessagesModule {}

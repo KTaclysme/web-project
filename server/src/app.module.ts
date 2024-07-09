@@ -9,26 +9,22 @@ import { SampleService } from './sample/sample.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { BullMQModule } from './bullmq/bullmq.module';
 import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot({
-      driver : ApolloDriver,
+      driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     AuthModule,
     UsersModule,
     PrismaModule,
-    MessagesModule
+    BullMQModule,
+    MessagesModule,
   ],
-  controllers: [
-    AppController
-  ],
-  providers: [
-    AppService,
-    SampleResolver,
-    SampleService
-  ],
+  controllers: [AppController],
+  providers: [AppService, SampleResolver, SampleService],
 })
 export class AppModule {}
