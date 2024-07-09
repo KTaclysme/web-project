@@ -1,8 +1,9 @@
+import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import SignUp from './pages/SignUp';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './context/ProtectedRoute';
 import './App.css';
 

@@ -3,6 +3,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { BullMQService } from './bullmq.service';
 import { MessageProcessor } from './bullmq.processor';
 import { PrismaModule } from '../prisma/prisma.module';
+import { WebSocketsModule } from '../websockets/websockets.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PrismaModule } from '../prisma/prisma.module';
       name: 'messages',
     }),
     PrismaModule,
+    WebSocketsModule,
   ],
   providers: [BullMQService, MessageProcessor],
   exports: [BullMQService],

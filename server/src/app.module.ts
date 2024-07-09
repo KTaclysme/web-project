@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloDriver } from '@nestjs/apollo';
-import { SampleResolver } from './sample/sample.resolver';
-import { SampleService } from './sample/sample.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { BullMQModule } from './bullmq/bullmq.module';
+import { BullModule } from '@nestjs/bullmq';
+import { BullMQService } from './bullmq/bullmq.service';
 import { MessagesModule } from './messages/messages.module';
+import { WebSocketsModule } from './websockets/websockets.module';
 
 @Module({
   imports: [
@@ -21,10 +19,18 @@ import { MessagesModule } from './messages/messages.module';
     AuthModule,
     UsersModule,
     PrismaModule,
-    BullMQModule,
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'messages',
+    }),
     MessagesModule,
+    WebSocketsModule
   ],
-  controllers: [AppController],
-  providers: [AppService, SampleResolver, SampleService],
+  providers: [BullMQService],
 })
 export class AppModule {}
