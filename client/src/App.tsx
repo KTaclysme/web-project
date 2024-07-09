@@ -1,19 +1,28 @@
-import React from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
-import SignUp from "./landing/SignUp";
-import Login from "./landing/Login";
-import "./App.css";
+import { Route, Routes } from 'react-router-dom';
+import SignUp from './pages/SignUp';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './context/ProtectedRoute';
+import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <>
+    <AuthProvider>
       <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/" element={<Navigate replace to="/signup" />} />
       </Routes>
-    </>
+    </AuthProvider>
   );
-}
+};
 
 export default App;

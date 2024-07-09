@@ -1,11 +1,11 @@
-import { useMutation, gql } from "@apollo/client";
-import { Link, useNavigate } from "react-router-dom";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-
-import client from "@/apollo-client";
+import { useMutation, gql } from '@apollo/client';
+import { Link, useNavigate } from 'react-router-dom';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import client from '@/apollo-client';
 
 const LOGIN_MUTATION = gql`
   mutation Login($username: String!, $password: String!) {
@@ -24,11 +24,12 @@ export const GET_USER_INFO = gql`
   }
 `;
 
-export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const Login: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [login] = useMutation(LOGIN_MUTATION);
+  const { login: authLogin } = useAuth();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -37,17 +38,17 @@ export default function Login() {
         variables: { username, password },
       });
       const token = response.data.login.access_token;
-      localStorage.setItem("accessToken", token);
+      localStorage.setItem('accessToken', token);
 
       const { data } = await client.query({
         query: GET_USER_INFO,
       });
 
-      localStorage.setItem("userInfo", JSON.stringify(data.me));
+      authLogin(data.me);
 
-      navigate("/dashboard");
+      navigate('/');
     } catch (error) {
-      console.error("Error during login:", error);
+      console.error('Error during login:', error);
     }
   };
 
@@ -65,7 +66,7 @@ export default function Login() {
             <Label htmlFor="username">Pseudo</Label>
             <Input
               id="username"
-              type="username"
+              type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -94,4 +95,6 @@ export default function Login() {
       </div>
     </div>
   );
-}
+};
+
+export default Login;

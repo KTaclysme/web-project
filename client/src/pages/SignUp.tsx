@@ -1,9 +1,9 @@
-import { useMutation, gql } from "@apollo/client";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMutation, gql } from '@apollo/client';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SIGNUP_MUTATION = gql`
   mutation Signup($username: String!, $password: String!) {
@@ -14,22 +14,22 @@ const SIGNUP_MUTATION = gql`
   }
 `;
 
-export default function SignUp() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const SignUp: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [signup] = useMutation(SIGNUP_MUTATION, {
     onError: (error) => {
-      console.error("SignUp mutation error:", error);
+      console.error('SignUp mutation error:', error);
       if (error.networkError) {
         setError(
-          "Network error: Unable to reach the server. Please try again later."
+          'Network error: Unable to reach the server. Please try again later.'
         );
       } else if (error.graphQLErrors.length > 0) {
         setError(error.graphQLErrors[0].message);
       } else {
-        setError("An unknown error occurred");
+        setError('An unknown error occurred');
       }
     },
   });
@@ -40,8 +40,8 @@ export default function SignUp() {
       const { data } = await signup({
         variables: { username, password },
       });
-      console.log("Signup response:", data);
-      navigate("/login");
+      console.log('Signup response:', data);
+      navigate('/login');
     } catch (err) {}
   };
 
@@ -55,9 +55,8 @@ export default function SignUp() {
           </p>
         </div>
         <form className="space-y-4" onSubmit={handleSignup}>
-          {" "}
           <div className="space-y-2">
-            <Label htmlFor="username">Pseudo</Label>{" "}
+            <Label htmlFor="username">Pseudo</Label>
             <Input
               id="username"
               type="text"
@@ -88,4 +87,6 @@ export default function SignUp() {
       </div>
     </div>
   );
-}
+};
+
+export default SignUp;
