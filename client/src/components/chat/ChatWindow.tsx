@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, IconButton, List, ListItem, ListItemText, Paper } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import { useAuth } from '@/context/AuthContext';
+import socket from '@/sockets';
 
 interface ChatWindowProps {
-  username: string;
+  userId: number;
 }
 
 interface Message {
@@ -12,18 +14,42 @@ interface Message {
   content: string;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ username }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ userId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.id) {
+      console.error('User ID is not defined');
+      return;
+    }
+
+    socket.on('receiveMessage', (message: Message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    return () => {
+      socket.off('receiveMessage');
+    };
+  }, [user]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
+    if (newMessage.trim() && user) {
       const message: Message = {
         id: messages.length + 1,
-        sender: 'Moi',
+        sender: user.username,
         content: newMessage,
       };
+
       setMessages([...messages, message]);
+
+      socket.emit('sendMessage', {
+        fromUserId: user.id,
+        toUserId: userId,
+        content: newMessage,
+      });
+
       setNewMessage('');
     }
   };
@@ -31,18 +57,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ username }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '90%' }}>
       <Typography variant="h6" gutterBottom>
-        Conversation avec {username}
+        Conversation avec {userId}
       </Typography>
       <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2 }}>
         <List>
           {messages.map((message) => (
-            <ListItem key={message.id} sx={{ justifyContent: message.sender === 'Moi' ? 'flex-end' : 'flex-start' }}>
+            <ListItem key={message.id} sx={{ justifyContent: message.sender === user?.username ? 'flex-end' : 'flex-start' }}>
               <Paper
                 elevation={2}
                 sx={{
                   p: 2,
-                  bgcolor: message.sender === 'Moi' ? 'primary.main' : 'grey.300',
-                  color: message.sender === 'Moi' ? 'white' : 'black',
+                  bgcolor: message.sender === user?.username ? 'primary.main' : 'grey.300',
+                  color: message.sender === user?.username ? 'white' : 'black',
                   borderRadius: 2,
                   maxWidth: '60%',
                 }}

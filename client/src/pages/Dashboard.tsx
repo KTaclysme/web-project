@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, CssBaseline, Divider, Drawer, Toolbar, Typography, AppBar, IconButton, Button } from '@mui/material';
+import { Box, CssBaseline, Divider, Drawer, Toolbar, Typography, AppBar, Button } from '@mui/material';
 import ChatWindow from '@/components/chat/ChatWindow';
 import UserList from '@/components/chat/UserList';
 import WelcomePage from '@/components/chat/WelcomePage';
@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 const drawerWidth = 250;
 
 const Dashboard: React.FC = () => {
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const { user, logout } = useAuth();
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
 
@@ -20,8 +20,8 @@ const Dashboard: React.FC = () => {
     }
   }, [user]);
 
-  const handleUserSelect = (username: string) => {
-    setSelectedUser(username);
+  const handleUserSelect = (userId: number) => {
+    setSelectedUserId(userId);
   };
 
   const handleLogout = () => {
@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            <img src={logo} width={200}/>
+            <img src={logo} width={200} />
           </Typography>
           <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
             Déconnexion
@@ -64,8 +64,8 @@ const Dashboard: React.FC = () => {
         sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, height: '100vh' }}
       >
         <Toolbar />
-        {selectedUser ? (
-          <ChatWindow username={selectedUser} />
+        {selectedUserId ? (
+          <ChatWindow userId={selectedUserId} />
         ) : (
           <WelcomePage username={currentUsername} />
         )}

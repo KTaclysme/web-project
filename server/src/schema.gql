@@ -19,7 +19,6 @@ type MessageType {
 }
 
 type Query {
-  hello: String!
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
