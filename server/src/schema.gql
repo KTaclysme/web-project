@@ -29,10 +29,15 @@ type Query {
 type Mutation {
   login(authInput: AuthInput!): AuthType!
   signup(authInput: AuthInput!): UserType!
-  createMessage(id: Int!, content: String!, userId: Int!): MessageType!
+  sendMessage(messageInput: MessageInput!): Boolean!
 }
 
 input AuthInput {
   username: String!
   password: String!
+}
+
+input MessageInput {
+  content: String!
+  toUserId: Int!
 }
