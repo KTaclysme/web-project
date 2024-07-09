@@ -3,7 +3,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../assets/logo-mixed.png';
 
 const SIGNUP_MUTATION = gql`
   mutation Signup($username: String!, $password: String!) {
@@ -47,8 +48,9 @@ const SignUp: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="mx-auto max-w-sm space-y-6 bg-white p-8 shadow-lg rounded-lg">
+      <div className="mx-auto max-w-xl space-y-6 bg-white p-8 shadow-lg rounded-lg" style={{width : '650px'}}>
         <div className="space-y-2 text-center">
+          <img src={logo} width={300} style={{marginBottom : 40, margin : 'auto'}}/>
           <h1 className="text-3xl font-bold">Inscription</h1>
           <p className="text-muted-foreground">
             Entrez votre Username ci-dessous pour vous connecter à votre compte.
@@ -84,6 +86,12 @@ const SignUp: React.FC = () => {
             </p>
           )}
         </form>
+        <Link
+          to="/login"
+          className="inline-block w-full text-center text-sm underline"
+        >
+          Déjà un compte, se connecter
+        </Link>
       </div>
     </div>
   );
