@@ -1,3 +1,4 @@
+import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import SignUp from "./landing/SignUp";
 import Login from "./landing/Login";
