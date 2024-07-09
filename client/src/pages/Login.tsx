@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import client from '@/apollo-client';
+import logo from '../assets/logo-mixed.png';
 
 const LOGIN_MUTATION = gql`
   mutation Login($username: String!, $password: String!) {
@@ -54,11 +55,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="mx-auto max-w-sm space-y-6 bg-white p-8 shadow-lg rounded-lg">
+      <div className="mx-auto max-w-xl space-y-6 bg-white p-8 shadow-lg rounded-lg" style={{width : '650px'}}>
         <div className="space-y-2 text-center">
+          <img src={logo} width={300} style={{marginBottom : 40, margin : 'auto'}}/>
           <h1 className="text-3xl font-bold">Connexion</h1>
           <p className="text-muted-foreground">
-            Entrez votre Username ci-dessous pour vous connecter à votre compte.
+            Entrez vos données pour vous connecter à votre compte.
           </p>
         </div>
         <form className="space-y-4" onSubmit={handleLogin}>
