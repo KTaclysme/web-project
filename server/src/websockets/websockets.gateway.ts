@@ -26,6 +26,8 @@ export class CustomWebSocketGateway implements OnGatewayConnection, OnGatewayDis
 
   @SubscribeMessage('sendMessage')
   handleMessage(@MessageBody() message: { fromUserId: number, toUserId: number, content: string }): void {
+    console.log("from : ", message.fromUserId);
+    console.log("to: ", message.toUserId);
     this.server.to(`user-${message.toUserId}`).emit('receiveMessage', message);
   }
 }

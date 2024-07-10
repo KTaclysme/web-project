@@ -3,7 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import { List, ListItem, ListItemText, CircularProgress, Typography, Box } from '@mui/material';
 
 interface UserListProps {
-  onSelectUser: (userId: number) => void;
+  onSelectUser: (userId: number, username: string) => void;
 }
 
 const GET_USERS = gql`
@@ -39,7 +39,7 @@ const UserList: React.FC<UserListProps> = ({ onSelectUser }) => {
   return (
     <List>
       {filteredUsers.map((user: { id: number; username: string }) => (
-        <ListItem button key={user.id} onClick={() => onSelectUser(user.id)}>
+        <ListItem button key={user.id} onClick={() => onSelectUser(user.id, user.username)}>
           <ListItemText primary={user.username} />
         </ListItem>
       ))}

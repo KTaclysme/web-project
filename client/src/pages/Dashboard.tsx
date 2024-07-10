@@ -22,7 +22,7 @@ import "../components/style/toastStyle.scss";
 const drawerWidth = 250;
 
 const Dashboard: React.FC = () => {
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{ id: number, username: string } | null>(null);
   const { user, logout } = useAuth();
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
 
@@ -32,8 +32,8 @@ const Dashboard: React.FC = () => {
     }
   }, [user]);
 
-  const handleUserSelect = (userId: number) => {
-    setSelectedUserId(userId);
+  const handleUserSelect = (userId: number, username: string) => {
+    setSelectedUser({ id: userId, username });
   };
 
   const handleLogout = () => {
@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
     setTimeout(() => {
       logout();
       window.location.reload();
-    }, 1500); // 1.5 seconds delay
+    }, 1500);
   };
 
   return (
@@ -94,8 +94,8 @@ const Dashboard: React.FC = () => {
         }}
       >
         <Toolbar />
-        {selectedUserId ? (
-          <ChatWindow userId={selectedUserId} />
+        {selectedUser ? (
+          <ChatWindow userId={selectedUser.id} username={selectedUser.username} />
         ) : (
           <WelcomePage username={currentUsername} />
         )}

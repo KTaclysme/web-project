@@ -6,6 +6,7 @@ import socket from '@/sockets';
 
 interface ChatWindowProps {
   userId: number;
+  username: string;
 }
 
 interface Message {
@@ -14,10 +15,14 @@ interface Message {
   content: string;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ userId }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const { user } = useAuth();
+
+  useEffect(() => {
+    setMessages([]);
+  }, [userId]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -26,7 +31,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId }) => {
     }
 
     socket.on('receiveMessage', (message: Message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      if (message.sender !== user.username) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
     });
 
     return () => {
@@ -57,7 +64,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '90%' }}>
       <Typography variant="h6" gutterBottom>
-        Conversation avec {userId}
+        Conversation avec {username}
       </Typography>
       <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2 }}>
         <List>
