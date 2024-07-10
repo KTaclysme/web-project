@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../components/style/toastStyle.scss";// Import your custom toast styles
+import "../components/style/toastStyle.scss";
 import logo from "../assets/logo-mixed.png";
 
 const SIGNUP_MUTATION = gql`
@@ -18,22 +18,37 @@ const SIGNUP_MUTATION = gql`
   }
 `;
 
+const validateUsername = (username: string): string | null => {
+  const regex = /^[a-zA-Z0-9]{4,24}$/;
+  if (username.length < 4) {
+    return "Le pseudo doit contenir au moins 4 caractères.";
+  }
+  if (username.length > 24) {
+    return "Le pseudo ne doit pas dépasser 24 caractères.";
+  }
+  if (!regex.test(username)) {
+    return "Le pseudo ne doit contenir que des lettres et des chiffres.";
+  }
+  return null;
+};
+
 const SignUp: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [signup] = useMutation(SIGNUP_MUTATION, {
     onError: (error) => {
       console.error("SignUp mutation error:", error);
       if (error.networkError) {
         setError(
-          "Network error: Unable to reach the server. Please try again later."
+          "Erreur réseau : Impossible d'atteindre le serveur. Veuillez réessayer plus tard."
         );
       } else if (error.graphQLErrors.length > 0) {
         setError(error.graphQLErrors[0].message);
       } else {
-        setError("An unknown error occurred");
+        setError("Une erreur inconnue est survenue.");
       }
       toast.error(`Erreur: ${error.message}`, {
         className: "toast-error",
@@ -43,6 +58,13 @@ const SignUp: React.FC = () => {
 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
+    const usernameValidationError = validateUsername(username);
+    if (usernameValidationError) {
+      setUsernameError(usernameValidationError);
+      return;
+    }
+    setUsernameError(null);
+
     try {
       const { data } = await signup({
         variables: { username, password },
@@ -54,13 +76,11 @@ const SignUp: React.FC = () => {
           className: "toast-success",
         }
       );
-      // Ajoutez un léger délai pour permettre à l'utilisateur de lire le toast avant la redirection
+
       setTimeout(() => {
         navigate("/login");
-      }, 1500); // 1.5 seconds delay
-    } catch (err) {
-      // Handled by onError
-    }
+      }, 1500);
+    } catch (err) {}
   };
 
   return (
@@ -71,7 +91,6 @@ const SignUp: React.FC = () => {
       >
         <div className="space-y-2 text-center">
           <img
-            alt="logo"
             src={logo}
             width={300}
             style={{ marginBottom: 40, margin: "auto" }}
@@ -91,6 +110,9 @@ const SignUp: React.FC = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
+            {usernameError && (
+              <p className="text-red-600 text-sm">{usernameError}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Mot de passe</Label>
