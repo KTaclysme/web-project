@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Box, CssBaseline, Divider, Drawer, Toolbar, Typography, AppBar, Button } from '@mui/material';
-import ChatWindow from '@/components/chat/ChatWindow';
-import UserList from '@/components/chat/UserList';
-import WelcomePage from '@/components/chat/WelcomePage';
-import logo from '../assets/logo.png';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '@/context/AuthContext';
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  Toolbar,
+  Typography,
+  AppBar,
+  Button,
+} from "@mui/material";
+import ChatWindow from "@/components/chat/ChatWindow";
+import UserList from "@/components/chat/UserList";
+import WelcomePage from "@/components/chat/WelcomePage";
+import logo from "../assets/logo.png";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../components/style/toastStyle.scss";
 
 const drawerWidth = 250;
 
@@ -25,19 +37,32 @@ const Dashboard: React.FC = () => {
   };
 
   const handleLogout = () => {
-    logout();
-    window.location.reload();
+    toast.success("Déconnexion réussie !", {
+      className: "toast-success",
+    });
+
+    setTimeout(() => {
+      logout();
+      window.location.reload();
+    }, 1500); // 1.5 seconds delay
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            <img src={logo} width={200} />
+            <img alt="logo" src={logo} width={200} />
           </Typography>
-          <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
+          <Button
+            color="inherit"
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+          >
             Déconnexion
           </Button>
         </Toolbar>
@@ -46,10 +71,10 @@ const Dashboard: React.FC = () => {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: '#f5f5f5',
+            boxSizing: "border-box",
+            backgroundColor: "#f5f5f5",
           },
         }}
         variant="permanent"
@@ -61,7 +86,12 @@ const Dashboard: React.FC = () => {
       </Drawer>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, height: '100vh' }}
+        sx={{
+          flexGrow: 1,
+          bgcolor: "background.default",
+          p: 3,
+          height: "100vh",
+        }}
       >
         <Toolbar />
         {selectedUserId ? (
