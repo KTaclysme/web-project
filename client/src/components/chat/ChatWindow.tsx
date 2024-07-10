@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { Box, Typography, TextField, IconButton, List, ListItem, ListItemText, Paper } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -44,10 +44,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
     variables: { userId1: user?.id, userId2: userId },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      setMessages(data.findAllMessagesBetweenUsers);
+      setMessages((data.findAllMessagesBetweenUsers));
+      scrollToBottom();
     },
   });
   const [sendMessage] = useMutation(SEND_MESSAGE);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (!user?.id) {
@@ -74,6 +82,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
   useEffect(() => {
     setMessages([]);
   }, [userId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && user) {
@@ -113,6 +125,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
           },
         });
         setNewMessage('');
+        scrollToBottom();
       } catch (error) {
         console.error('Error sending message:', error);
       }
@@ -148,6 +161,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
               </Paper>
             </ListItem>
           ))}
+          <div ref={messagesEndRef} />
         </List>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
