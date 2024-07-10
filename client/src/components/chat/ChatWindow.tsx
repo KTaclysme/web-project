@@ -40,7 +40,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const { data, loading, error } = useQuery(GET_MESSAGES, {
+  const { loading, error } = useQuery(GET_MESSAGES, {
     variables: { userId },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
