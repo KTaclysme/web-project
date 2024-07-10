@@ -12,10 +12,24 @@ type AuthType {
   access_token: String!
 }
 
+type MessageType {
+  id: Int!
+  content: String!
+  createdAt: DateTime!
+  fromUserId: Int!
+  toUserId: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
+  findAllByUserId(userId: Float!): [MessageType!]!
 }
 
 type Mutation {
