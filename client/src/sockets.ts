@@ -6,7 +6,7 @@ if (!userId) {
   console.error('User ID is not set in localStorage');
 }
 
-const sockets = io('http://localhost:3005', {
+const sockets = io(import.meta.env.VITE_BACKEND, {
   query: {
     userId: userId,
   },
