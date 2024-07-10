@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { gql, useMutation } from '@apollo/client';
 import { Box, Typography, TextField, IconButton, List, ListItem, ListItemText, Paper } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { useAuth } from '@/context/AuthContext';
-import socket from '@/sockets';
+import sockets from '@/sockets';
+
+const SEND_MESSAGE = gql`
+  mutation SendMessage($messageInput: MessageInput!) {
+    sendMessage(messageInput: $messageInput)
+  }
+`;
 
 interface ChatWindowProps {
   userId: number;
@@ -19,6 +26,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const { user } = useAuth();
+  const [sendMessage] = useMutation(SEND_MESSAGE);
 
   useEffect(() => {
     setMessages([]);
@@ -30,18 +38,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
       return;
     }
 
-    socket.on('receiveMessage', (message: Message) => {
+    sockets.on('receiveMessage', (message: Message) => {
       if (message.sender !== user.username) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
     });
 
     return () => {
-      socket.off('receiveMessage');
+      sockets.off('receiveMessage');
     };
   }, [user]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() && user) {
       const message: Message = {
         id: messages.length + 1,
@@ -51,13 +59,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
 
       setMessages([...messages, message]);
 
-      socket.emit('sendMessage', {
-        fromUserId: user.id,
-        toUserId: userId,
-        content: newMessage,
-      });
-
-      setNewMessage('');
+      try {
+        await sendMessage({
+          variables: {
+            messageInput: {
+              content: newMessage,
+              toUserId: userId,
+            },
+          },
+        });
+        setNewMessage('');
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     }
   };
 
