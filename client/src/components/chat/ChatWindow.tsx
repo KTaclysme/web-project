@@ -6,8 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import sockets from '@/sockets';
 
 const GET_MESSAGES = gql`
-  query GetMessages($userId: Int!) {
-    findAllByUserId(userId: $userId) {
+  query GetMessages($userId1: Int!, $userId2: Int!) {
+    findAllMessagesBetweenUsers(userId1: $userId1, userId2: $userId2) {
       id
       fromUserId
       toUserId
@@ -41,10 +41,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const { loading, error } = useQuery(GET_MESSAGES, {
-    variables: { userId },
+    variables: { userId1: user?.id, userId2: userId },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      setMessages(data.findAllByUserId);
+      setMessages(data.findAllMessagesBetweenUsers);
     },
   });
   const [sendMessage] = useMutation(SEND_MESSAGE);
@@ -56,15 +56,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
     }
 
     const handleReceiveMessage = (message: Message) => {
-      setMessages((prevMessages) => {
-        const messageExists = prevMessages.some(
-          (prevMessage) => prevMessage.id === message.id
-        );
-        if (!messageExists) {
-          return [...prevMessages, message];
-        }
-        return prevMessages;
-      });
+      if (
+        (message.fromUserId === Number(user.id) && message.toUserId === userId) ||
+        (message.fromUserId === userId && message.toUserId === Number(user.id))
+      ) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
     };
 
     sockets.on('receiveMessage', handleReceiveMessage);
@@ -72,7 +69,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
     return () => {
       sockets.off('receiveMessage', handleReceiveMessage);
     };
-  }, [user]);
+  }, [user, userId]);
 
   useEffect(() => {
     setMessages([]);
@@ -101,15 +98,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
           update: (cache) => {
             const existingMessages: any = cache.readQuery({
               query: GET_MESSAGES,
-              variables: { userId },
+              variables: { userId1: user.id, userId2: userId },
             });
 
             if (existingMessages) {
               cache.writeQuery({
                 query: GET_MESSAGES,
-                variables: { userId },
+                variables: { userId1: user.id, userId2: userId },
                 data: {
-                  findAllByUserId: [...existingMessages.findAllByUserId, { ...message, id: existingMessages.findAllByUserId.length + 1 }],
+                  findAllMessagesBetweenUsers: [...existingMessages.findAllMessagesBetweenUsers, { ...message, id: existingMessages.findAllMessagesBetweenUsers.length + 1 }],
                 },
               });
             }

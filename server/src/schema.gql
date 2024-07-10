@@ -29,7 +29,7 @@ type Query {
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
-  findAllByUserId(userId: Int!): [MessageType!]!
+  findAllMessagesBetweenUsers(userId1: Int!, userId2: Int!): [MessageType!]!
 }
 
 type Mutation {

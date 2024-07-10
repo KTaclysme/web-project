@@ -10,12 +10,12 @@ export class MessagesService {
     private readonly bullMQService: BullMQService, 
   ) {}
 
-  async findAllByUserId(userId: number): Promise<Message[] | null> {
+  async findAllMessagesBetweenUsers(userId1: number, userId2: number): Promise<Message[] | null> {
     return await this.prisma.message.findMany({
       where: {
         OR: [
-          { fromUserId: userId },
-          { toUserId: userId },
+          { fromUserId: userId1, toUserId: userId2 },
+          { fromUserId: userId2, toUserId: userId1 },
         ],
       },
       select: {
@@ -25,6 +25,10 @@ export class MessagesService {
         fromUserId: true,
         toUserId: true,
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
-  }
+  }  
+  
 }

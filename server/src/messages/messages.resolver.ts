@@ -25,7 +25,12 @@ export class MessagesResolver {
   }
 
   @Query(returns => [MessageType])
-  findAllByUserId(@Args('userId', { type: () => Int }) userId: number) {
-    return this.messagesService.findAllByUserId(userId);
+  @UseGuards(GqlJwtAuthGuard)
+  async findAllMessagesBetweenUsers(
+    @Args('userId1', { type: () => Int }) userId1: number,
+    @Args('userId2', { type: () => Int }) userId2: number,
+  ) {
+    return this.messagesService.findAllMessagesBetweenUsers(userId1, userId2);
   }
+  
 }
