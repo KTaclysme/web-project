@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { initializeSockets } from '@/sockets';
 
 interface User {
   id: string;
@@ -7,7 +8,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  loading : Boolean;
+  loading: boolean;
   login: (userData: User) => void;
   logout: () => void;
 }
@@ -21,7 +22,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const storedUser = localStorage.getItem('userInfo');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      initializeSockets(parsedUser.id); 
     }
     setLoading(false);
   }, []);
@@ -29,6 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('userInfo', JSON.stringify(userData));
+    initializeSockets(userData.id);
   };
 
   const logout = () => {

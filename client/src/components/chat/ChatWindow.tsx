@@ -3,7 +3,8 @@ import { gql, useQuery, useMutation } from '@apollo/client';
 import { Box, Typography, TextField, IconButton, List, ListItem, ListItemText, Paper } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { useAuth } from '@/context/AuthContext';
-import sockets from '@/sockets';
+import { getSockets } from '@/sockets';
+import client from '@/apollo-client';
 
 const GET_MESSAGES = gql`
   query GetMessages($userId1: Int!, $userId2: Int!) {
@@ -40,11 +41,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const { loading, error } = useQuery(GET_MESSAGES, {
+  const { loading, error, refetch } = useQuery(GET_MESSAGES, {
     variables: { userId1: user?.id, userId2: userId },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      setMessages((data.findAllMessagesBetweenUsers));
+      setMessages(data.findAllMessagesBetweenUsers);
       scrollToBottom();
     },
   });
@@ -63,12 +64,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
       return;
     }
 
+    const sockets = getSockets();
+    if (!sockets) {
+      console.error('Sockets not initialized');
+      return;
+    }
+
     const handleReceiveMessage = (message: Message) => {
       if (
         (message.fromUserId === Number(user.id) && message.toUserId === userId) ||
         (message.fromUserId === userId && message.toUserId === Number(user.id))
       ) {
         setMessages((prevMessages) => [...prevMessages, message]);
+        scrollToBottom();
       }
     };
 
@@ -78,6 +86,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
       sockets.off('receiveMessage', handleReceiveMessage);
     };
   }, [user, userId]);
+
+  useEffect(() => {
+    if (user && userId) {
+      const existingMessages = client.readQuery({
+        query: GET_MESSAGES,
+        variables: { userId1: user.id, userId2: userId },
+      });
+
+      if (existingMessages) {
+        setMessages(existingMessages.findAllMessagesBetweenUsers);
+      } else {
+        refetch();
+      }
+    }
+  }, [user, userId, client, refetch]);
 
   useEffect(() => {
     setMessages([]);

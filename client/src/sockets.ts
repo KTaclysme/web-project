@@ -1,15 +1,18 @@
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
-const userId = localStorage.getItem('userId');
+let sockets: Socket | null = null;
 
-if (!userId) {
-  console.error('User ID is not set in localStorage');
-}
+export const initializeSockets = (userId: string) => {
+  if (!userId) {
+    console.error('User ID is not set in localStorage');
+    return;
+  }
 
-const sockets = io(import.meta.env.VITE_BACKEND, {
-  query: {
-    userId: userId,
-  },
-});
+  sockets = io(import.meta.env.VITE_BACKEND, {
+    query: {
+      userId: userId,
+    },
+  });
+};
 
-export default sockets;
+export const getSockets = (): Socket | null => sockets;
