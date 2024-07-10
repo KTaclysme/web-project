@@ -1,10 +1,13 @@
-import { useMutation, gql } from '@apollo/client';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/logo-mixed.png';
+import { useMutation, gql } from "@apollo/client";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../components/style/toastStyle.scss";// Import your custom toast styles
+import logo from "../assets/logo-mixed.png";
 
 const SIGNUP_MUTATION = gql`
   mutation Signup($username: String!, $password: String!) {
@@ -16,22 +19,25 @@ const SIGNUP_MUTATION = gql`
 `;
 
 const SignUp: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [signup] = useMutation(SIGNUP_MUTATION, {
     onError: (error) => {
-      console.error('SignUp mutation error:', error);
+      console.error("SignUp mutation error:", error);
       if (error.networkError) {
         setError(
-          'Network error: Unable to reach the server. Please try again later.'
+          "Network error: Unable to reach the server. Please try again later."
         );
       } else if (error.graphQLErrors.length > 0) {
         setError(error.graphQLErrors[0].message);
       } else {
-        setError('An unknown error occurred');
+        setError("An unknown error occurred");
       }
+      toast.error(`Erreur: ${error.message}`, {
+        className: "toast-error",
+      });
     },
   });
 
@@ -41,16 +47,35 @@ const SignUp: React.FC = () => {
       const { data } = await signup({
         variables: { username, password },
       });
-      console.log('Signup response:', data);
-      navigate('/login');
-    } catch (err) {}
+      console.log("Signup response:", data);
+      toast.success(
+        "Inscription réussie ! Vous pouvez maintenant vous connecter.",
+        {
+          className: "toast-success",
+        }
+      );
+      // Ajoutez un léger délai pour permettre à l'utilisateur de lire le toast avant la redirection
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500); // 1.5 seconds delay
+    } catch (err) {
+      // Handled by onError
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="mx-auto max-w-xl space-y-6 bg-white p-8 shadow-lg rounded-lg" style={{width : '650px'}}>
+      <div
+        className="mx-auto max-w-xl space-y-6 bg-white p-8 shadow-lg rounded-lg"
+        style={{ width: "650px" }}
+      >
         <div className="space-y-2 text-center">
-          <img src={logo} width={300} style={{marginBottom : 40, margin : 'auto'}}/>
+          <img
+            alt="logo"
+            src={logo}
+            width={300}
+            style={{ marginBottom: 40, margin: "auto" }}
+          />
           <h1 className="text-3xl font-bold">Inscription</h1>
           <p className="text-muted-foreground">
             Entrez votre Username ci-dessous pour vous connecter à votre compte.
@@ -82,7 +107,7 @@ const SignUp: React.FC = () => {
           </Button>
           {error && (
             <p className="mt-4 text-center text-sm text-red-600">
-              Error: {error}
+              Erreur: {error}
             </p>
           )}
         </form>
