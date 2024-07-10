@@ -18,7 +18,21 @@ export class MessagesService {
     return message;
   }
 
-  async findAllByUserId(userId): Promise<MessageType[]> {
-    return await this.prisma.message.findMany({where: {userId: userId}});
+  async findAllByUserId(userId: number): Promise<MessageType[]> {
+    return this.prisma.message.findMany({
+      where: {
+        OR: [
+          { fromUserId: userId },
+          { toUserId: userId },
+        ],
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        fromUserId: true,
+        toUserId: true,
+      },
+    });
   }
 }
