@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import { Box, Typography, TextField, IconButton, List, ListItem, ListItemText, Paper } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { useAuth } from '@/context/AuthContext';
 import sockets from '@/sockets';
+
+const GET_MESSAGES = gql`
+  query GetMessages($userId: Int!) {
+    findAllByUserId(userId: $userId) {
+      id
+      fromUserId
+      toUserId
+      createdAt
+      content
+    }
+  }
+`;
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($messageInput: MessageInput!) {
@@ -18,19 +30,24 @@ interface ChatWindowProps {
 
 interface Message {
   id: number;
-  sender: string;
+  fromUserId: number;
+  toUserId: number;
   content: string;
+  createdAt: string;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const { user } = useAuth();
+  const { data, loading, error } = useQuery(GET_MESSAGES, {
+    variables: { userId },
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      setMessages(data.findAllByUserId);
+    },
+  });
   const [sendMessage] = useMutation(SEND_MESSAGE);
-
-  useEffect(() => {
-    setMessages([]);
-  }, [userId]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -38,26 +55,40 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
       return;
     }
 
-    sockets.on('receiveMessage', (message: Message) => {
-      if (message.sender !== user.username) {
-        setMessages((prevMessages) => [...prevMessages, message]);
-      }
-    });
+    const handleReceiveMessage = (message: Message) => {
+      setMessages((prevMessages) => {
+        const messageExists = prevMessages.some(
+          (prevMessage) => prevMessage.id === message.id
+        );
+        if (!messageExists) {
+          return [...prevMessages, message];
+        }
+        return prevMessages;
+      });
+    };
+
+    sockets.on('receiveMessage', handleReceiveMessage);
 
     return () => {
-      sockets.off('receiveMessage');
+      sockets.off('receiveMessage', handleReceiveMessage);
     };
   }, [user]);
 
+  useEffect(() => {
+    setMessages([]);
+  }, [userId]);
+
   const handleSendMessage = async () => {
     if (newMessage.trim() && user) {
-      const message: Message = {
-        id: messages.length + 1,
-        sender: user.username,
+      const message = {
+        id: Date.now(),
+        fromUserId: Number(user.id),
+        toUserId: userId,
         content: newMessage,
+        createdAt: new Date().toISOString(),
       };
 
-      setMessages([...messages, message]);
+      setMessages((prevMessages) => [...prevMessages, message]);
 
       try {
         await sendMessage({
@@ -67,6 +98,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
               toUserId: userId,
             },
           },
+          update: (cache) => {
+            const existingMessages: any = cache.readQuery({
+              query: GET_MESSAGES,
+              variables: { userId },
+            });
+
+            if (existingMessages) {
+              cache.writeQuery({
+                query: GET_MESSAGES,
+                variables: { userId },
+                data: {
+                  findAllByUserId: [...existingMessages.findAllByUserId, { ...message, id: existingMessages.findAllByUserId.length + 1 }],
+                },
+              });
+            }
+          },
         });
         setNewMessage('');
       } catch (error) {
@@ -74,6 +121,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
       }
     }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '90%' }}>
@@ -83,20 +133,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ userId, username }) => {
       <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2 }}>
         <List>
           {messages.map((message) => (
-            <ListItem key={message.id} sx={{ justifyContent: message.sender === user?.username ? 'flex-end' : 'flex-start' }}>
+            <ListItem key={message.id} sx={{ justifyContent: message.fromUserId === Number(user?.id) ? 'flex-end' : 'flex-start' }}>
               <Paper
                 elevation={2}
                 sx={{
                   p: 2,
-                  bgcolor: message.sender === user?.username ? 'primary.main' : 'grey.300',
-                  color: message.sender === user?.username ? 'white' : 'black',
+                  bgcolor: message.fromUserId === Number(user?.id) ? 'primary.main' : 'grey.300',
+                  color: message.fromUserId === Number(user?.id) ? 'white' : 'black',
                   borderRadius: 2,
                   maxWidth: '60%',
                 }}
               >
                 <ListItemText
-                  primary={message.sender}
-                  secondary={message.content}
+                  primary={message.content}
+                  secondary={new Date(message.createdAt).toLocaleString()}
                 />
               </Paper>
             </ListItem>
