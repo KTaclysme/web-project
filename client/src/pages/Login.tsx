@@ -45,6 +45,8 @@ const Login: React.FC = () => {
         query: GET_USER_INFO,
       });
 
+      const userId = data.me.id;
+      localStorage.setItem('userId', userId);
       authLogin(data.me);
 
       navigate('/');

@@ -13,7 +13,6 @@ type AuthType {
 }
 
 type Query {
-  hello: String!
   me: UserType!
   users: [UserType!]!
   user(id: Float!): UserType
@@ -22,9 +21,15 @@ type Query {
 type Mutation {
   login(authInput: AuthInput!): AuthType!
   signup(authInput: AuthInput!): UserType!
+  sendMessage(messageInput: MessageInput!): Boolean!
 }
 
 input AuthInput {
   username: String!
   password: String!
+}
+
+input MessageInput {
+  content: String!
+  toUserId: Int!
 }
